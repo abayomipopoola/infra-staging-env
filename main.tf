@@ -26,7 +26,7 @@ data "aws_eks_cluster" "msur" {
 }
 
 module "aws-network" {
-  source = "./modules/module-aws-network"
+  source = "./module-aws-network"
 
   env_name              = local.env_name
   vpc_name              = "msur-VPC"
@@ -40,7 +40,7 @@ module "aws-network" {
 }
 
 module "aws-kubernetes-cluster" {
-  source = "./modules/module-aws-kubernetes"
+  source = "./module-aws-kubernetes"
 
   ms_namespace       = "microservices"
   env_name           = local.env_name
@@ -77,7 +77,7 @@ resource "kubernetes_namespace" "ms-namespace" {
 }
 
 module "argo-cd-server" {
-  source = "./modules/module-argo-cd"
+  source = "./module-argo-cd"
 
   aws_region            = local.aws_region
   kubernetes_cluster_id = data.aws_eks_cluster.msur.id
@@ -90,7 +90,7 @@ module "argo-cd-server" {
 }
 
 module "aws-databases" {
-  source = "./modules/module-aws-db"
+  source = "./module-aws-db"
 
   aws_region     = local.aws_region
   mysql_password = var.mysql_password
@@ -104,7 +104,7 @@ module "aws-databases" {
 }
 
 module "traefik" {
-  source = "./modules/module-aws-traefik/"
+  source = "./module-aws-traefik/"
 
   aws_region                   = local.aws_region
   kubernetes_cluster_id        = data.aws_eks_cluster.msur.id

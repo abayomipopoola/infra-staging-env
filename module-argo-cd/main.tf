@@ -31,7 +31,6 @@ data "aws_eks_cluster" "msur" {
 }
 
 provider "kubernetes" {
-  load_config_file       = false
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.msur.certificate_authority.0.data)
   host                   = data.aws_eks_cluster.msur.endpoint
   exec {
@@ -45,7 +44,6 @@ provider "kubernetes" {
 
 provider "helm" {
   kubernetes {
-    load_config_file       = false
     cluster_ca_certificate = base64decode(data.aws_eks_cluster.msur.certificate_authority.0.data)
     host                   = data.aws_eks_cluster.msur.endpoint
     exec {
