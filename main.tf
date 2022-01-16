@@ -22,7 +22,7 @@ provider "aws" {
 }
 
 data "aws_eks_cluster" "msur" {
-  name              = module.aws-kubernetes-cluster.eks_cluster_id
+  name = module.aws-kubernetes-cluster.eks_cluster_id
 }
 
 module "aws-network" {
