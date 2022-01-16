@@ -1,14 +1,14 @@
 terraform {
   backend "s3" {
-    bucket = "YOUR_BUCKET"
-    key    = "YOUR_KEY"
-    region = "YOUR_REGION"
+    bucket = "terraform-backend-rm"
+    key    = "terraform-env"
+    region = "eu-west-1"
   }
 }
 
 locals {
   env_name         = "staging"
-  aws_region       = "YOUR_REGION"
+  aws_region       = "eu-west-1"
   k8s_cluster_name = "ms-cluster"
 }
 
@@ -26,7 +26,7 @@ data "aws_eks_cluster" "msur" {
 }
 
 module "aws-network" {
-  source = "github.com/implementing-microservices/module-aws-network"
+  source = "./modules/module-aws-network"
 
   env_name              = local.env_name
   vpc_name              = "msur-VPC"
@@ -40,7 +40,7 @@ module "aws-network" {
 }
 
 module "aws-kubernetes-cluster" {
-  source = "github.com/implementing-microservices/module-aws-kubernetes"
+  source = "./modules/module-aws-kubernetes"
 
   ms_namespace       = "microservices"
   env_name           = local.env_name
@@ -60,7 +60,6 @@ module "aws-kubernetes-cluster" {
 # Create namespace
 # Use kubernetes provider to work with the kubernetes cluster API
 provider "kubernetes" {
-  load_config_file       = false
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.msur.certificate_authority.0.data)
   host                   = data.aws_eks_cluster.msur.endpoint
   exec {
@@ -78,7 +77,7 @@ resource "kubernetes_namespace" "ms-namespace" {
 }
 
 module "argo-cd-server" {
-  source = "github.com/implementing-microservices/module-argo-cd"
+  source = "./modules/module-argo-cd"
 
   aws_region            = local.aws_region
   kubernetes_cluster_id = data.aws_eks_cluster.msur.id
@@ -91,7 +90,7 @@ module "argo-cd-server" {
 }
 
 module "aws-databases" {
-  source = "github.com/implementing-microservices/module-aws-db"
+  source = "./modules/module-aws-db"
 
   aws_region     = local.aws_region
   mysql_password = var.mysql_password
@@ -105,7 +104,7 @@ module "aws-databases" {
 }
 
 module "traefik" {
-  source = "github.com/implementing-microservices/module-aws-traefik/"
+  source = "./modules/module-aws-traefik/"
 
   aws_region                   = local.aws_region
   kubernetes_cluster_id        = data.aws_eks_cluster.msur.id
